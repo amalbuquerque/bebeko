@@ -1,0 +1,8 @@
+{
+  "name": "Bebeko simple slideshow",
+  "description": "Simple baby slideshow",
+  "repository": "https://github.com/lejboua/bebeko",
+  "logo": "http://node-js-sample.herokuapp.com/node.svg",
+  "keywords": ["node", "express", "dropbox", "static"],
+  "image": "heroku/nodejs"
+}
