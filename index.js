@@ -1,6 +1,6 @@
-var cool = require('cool-ascii-faces');
 var mongoose = require('mongoose');
-var models = require('./models/Slideshow')
+var models = require('./models/Slideshow');
+var routes = require('./routes/route');
 var express = require('express');
 
 var app = express();
@@ -11,7 +11,7 @@ var app = express();
 mongoose.connect(process.env.MONGODB);
 mongoose.connection.on('error', function() {
     console.log('MongoDB Connection Error. Please make sure that MongoDB is running.');
-    process.exit(1);
+    // process.exit(1);
 });
 
 mongoose.connection.on('open', function() {
@@ -38,18 +38,8 @@ app.use(express.static(__dirname + '/public'));
 app.set('views', __dirname + '/views');
 app.set('view engine', 'ejs');
 
-app.get('/', function(request, response) {
-  response.render('pages/index');
-});
-
-app.get('/cool', function(request, response) {
-    var result = '';
-    var times = process.env.TIMES || 5;
-    for (var i = 0; i < times; i++) {
-        result += cool() + "<br />";
-    }
-    response.send(result);
-});
+// 2016-01-17, AA: Using routes/route.js (routes separated)
+app.use('/', routes);
 
 app.listen(app.get('port'), function() {
   console.log('Node app is running on port', app.get('port'));
