@@ -1,24 +1,13 @@
 module.exports = (function() {
     'use strict';
     var router = require('express').Router();
-    var cool = require('cool-ascii-faces');
+    var homeController = require('../controllers/home');
 
-    router.get('/brua', function(req, res) {
-        res.json({'foo':'bar'});
-    });
+    router.get('/brua', homeController.brua);
 
-    router.get('/', function(request, response) {
-      response.render('pages/index');
-    });
+    router.get('/', homeController.index);
 
-    router.get('/cool', function(request, response) {
-        var result = '';
-        var times = process.env.TIMES || 5;
-        for (var i = 0; i < times; i++) {
-            result += cool() + "<br />";
-        }
-        response.send(result);
-    });
+    router.get('/cool', homeController.cool);
 
     return router;
 })();
