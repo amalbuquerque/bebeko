@@ -1,6 +1,34 @@
 var cool = require('cool-ascii-faces');
+var mongoose = require('mongoose');
+var models = require('./models/Slideshow')
 var express = require('express');
+
 var app = express();
+
+/**
+ * Connect to MongoDB.
+ **/
+mongoose.connect(process.env.MONGODB);
+mongoose.connection.on('error', function() {
+    console.log('MongoDB Connection Error. Please make sure that MongoDB is running.');
+    process.exit(1);
+});
+
+mongoose.connection.on('open', function() {
+    console.log('Connected to Mongolab MongoDB via Mongoose...');
+
+    // var hardcoded = new models.Slideshow({ name: 'third', 'token': 'abcxyz' });
+    // console.log(hardcoded);
+    // hardcoded.save(function(err, hc) {
+    //     if (err) return console.error(err);
+    //     console.log('hardcoded saved OK');
+    // });
+
+    models.Slideshow.find(function(err, slideshows) {
+        if (err) return console.error(err);
+        console.log(slideshows);
+    });
+});
 
 app.set('port', (process.env.PORT || 5000));
 
