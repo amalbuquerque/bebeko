@@ -1,11 +1,15 @@
 var dbUtils = require('../utils/dropboxutils');
+var cache = require('../utils/cache');
 var url = require('url');
+var request = require('request');
+
+var REDIRECT_URL_KEY = 'REDIRECT_URL';
 
 exports.index = function(req, res){
     res.render('pages/index');
 };
 
-exports.cool = function(request, response) {
+exports.cool = function(req, res) {
     var cool = require('cool-ascii-faces');
 
     var result = '';
@@ -13,7 +17,7 @@ exports.cool = function(request, response) {
     for (var i = 0; i < times; i++) {
         result += cool() + "<br />";
     }
-    response.send(result);
+    res.send(result);
 };
 
 exports.brua = function(req, res) {
@@ -27,6 +31,8 @@ exports.brua = function(req, res) {
     // https://www.built.io/blog/2014/08/file-uploading-in-dropbox-using-node-js/
     var csrfToken = dbUtils.generateCSRFToken();
     var redirectUrl = dbUtils.generateRedirectURI(req);
+    cache.put(REDIRECT_URL_KEY, redirectUrl);
+
     console.log('REDIRECT TO: ', redirectUrl);
     console.log('CSRF: ', csrfToken);
 
@@ -39,7 +45,7 @@ exports.brua = function(req, res) {
             client_id: dbKey, //App key of dropbox api
             response_type: 'code',
             state: csrfToken,
-            redirect_uri: dbUtils.generateRedirectURI(req)
+            redirect_uri: redirectUrl
         }
     }));
 };
@@ -63,11 +69,14 @@ exports.bruaSuccess = function(req, res) {
         );
     }
 
+    // 2016/01/18 22:20:50, AA: It has to use the same redirect created previously
+    var redirectUri = cache.get(REDIRECT_URL_KEY);
+
     request.post('https://api.dropbox.com/1/oauth2/token', {
         form: {
             code: req.query.code,
             grant_type: 'authorization_code',
-            redirect_uri: dbUtils.generateRedirectURI(req)
+            redirect_uri: redirectUri
         },
         auth: {
             user: dbKey,
@@ -80,7 +89,7 @@ exports.bruaSuccess = function(req, res) {
         }
 
         var token = data.access_token;
-        req.session.token=data.access_token;
+        req.session.token = data.access_token;
         request.post('https://api.dropbox.com/1/account/info', {
             headers: { Authorization: 'Bearer ' + token }
         }, function (error, response, body) {

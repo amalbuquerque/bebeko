@@ -2,8 +2,14 @@ var mongoose = require('mongoose');
 var models = require('./models/Slideshow');
 var routes = require('./routes/route');
 var express = require('express');
+var cookieParser = require('cookie-parser');
+var session = require('express-session');
 
 var app = express();
+app.use(cookieParser());
+app.use(session({ secret: process.env.SESSION_SECRET || 'not_secret_at_all',
+                  saveUninitialized: true,
+                  resave: true }));
 
 /**
  * Connect to MongoDB.
