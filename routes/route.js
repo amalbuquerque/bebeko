@@ -4,6 +4,7 @@ module.exports = (function() {
     var homeController = require('../controllers/home');
 
     router.get('/brua', homeController.brua);
+    router.get('/brua/success', homeController.bruaSuccess);
 
     router.get('/', homeController.index);
 
