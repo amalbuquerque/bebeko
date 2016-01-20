@@ -3,8 +3,9 @@ module.exports = (function() {
     var router = require('express').Router();
     var homeController = require('../controllers/home');
 
-    router.get('/brua', homeController.brua);
-    router.get('/brua/success', homeController.bruaSuccess);
+    router.get('/dbauth', homeController.dbauth);
+    router.get('/dbauth/success', homeController.dbauthSuccess);
+    router.get('/uploadpdf', homeController.uploadpdf);
 
     router.get('/', homeController.index);
 

@@ -2,6 +2,7 @@ var dbUtils = require('../utils/dropboxutils');
 var cache = require('../utils/cache');
 var url = require('url');
 var request = require('request');
+var fs = require('fs');
 
 var REDIRECT_URL_KEY = 'REDIRECT_URL';
 
@@ -20,7 +21,7 @@ exports.cool = function(req, res) {
     res.send(result);
 };
 
-exports.brua = function(req, res) {
+exports.dbauth = function(req, res) {
     var dbKey = process.env.DB_APP_KEY || '';
     var dbSecret = process.env.DB_APP_SECRET || '';
     if (dbKey === '' || dbSecret === '' ){
@@ -50,8 +51,8 @@ exports.brua = function(req, res) {
     }));
 };
 
-exports.bruaSuccess = function(req, res) {
-    console.log('SUCCESS Callback called from redirect from DB');
+exports.dbauthSuccess = function(req, res) {
+    console.log('SUCCESS Callback called via redirect from Dropbox');
 
     var dbKey = process.env.DB_APP_KEY || '';
     var dbSecret = process.env.DB_APP_SECRET || '';
@@ -97,4 +98,17 @@ exports.bruaSuccess = function(req, res) {
         });
 
     });
+};
+
+exports.uploadpdf = function(req, res) {
+    // first dumb upload test
+    var serverpath = 'example_alright.pdf'; //file to be save at what path in server
+    var localpath =  global.appRoot + '2091.pdf'; //path of the file which is to be uploaded
+
+    console.log('I will send the following file: ', localpath);
+    if (req.query.error) {
+        return res.send('ERROR ' + req.query.error + ': ' + req.query.error_description);
+    }
+
+    return dbUtils.fileUpload(res, req.session.token, localpath, serverpath);
 };

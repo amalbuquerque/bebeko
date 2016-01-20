@@ -36,3 +36,5 @@ node_modules
 # from Heroku node.js getting started
 .env
 
+# misc
+*.pdf

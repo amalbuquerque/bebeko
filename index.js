@@ -5,6 +5,9 @@ var express = require('express');
 var cookieParser = require('cookie-parser');
 var session = require('express-session');
 
+// 2016/01/20 00:15:26, AA: From https://gist.github.com/branneman/8048520
+global.appRoot = __dirname + '/';
+
 var app = express();
 app.use(cookieParser());
 app.use(session({ secret: process.env.SESSION_SECRET || 'not_secret_at_all',
