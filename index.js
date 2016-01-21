@@ -1,12 +1,12 @@
+// 2016/01/20 00:15:26, AA: From https://gist.github.com/branneman/8048520
+global.appRoot = __dirname + '/';
+
 var mongoose = require('mongoose');
 var models = require('./models/Slideshow');
 var routes = require('./routes/route');
 var express = require('express');
 var cookieParser = require('cookie-parser');
 var session = require('express-session');
-
-// 2016/01/20 00:15:26, AA: From https://gist.github.com/branneman/8048520
-global.appRoot = __dirname + '/';
 
 var app = express();
 app.use(cookieParser());
@@ -33,10 +33,10 @@ mongoose.connection.on('open', function() {
     //     console.log('hardcoded saved OK');
     // });
 
-    models.Slideshow.find(function(err, slideshows) {
-        if (err) return console.error(err);
-        console.log(slideshows);
-    });
+    // models.Slideshow.find(function(err, slideshows) {
+    //     if (err) return console.error(err);
+    //     console.log(slideshows);
+    // });
 });
 
 app.set('port', (process.env.PORT || 5000));

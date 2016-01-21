@@ -1,8 +1,11 @@
-var dbUtils = require('../utils/dropboxutils');
-var cache = require('../utils/cache');
 var url = require('url');
 var request = require('request');
 var fs = require('fs');
+
+// appRoot set on index.js
+var dbUtils = require(appRoot + '/utils/dropboxutils');
+var models = require(appRoot + '/models/Slideshow');
+var cache = require(appRoot + '/utils/cache');
 
 var REDIRECT_URL_KEY = 'REDIRECT_URL';
 
@@ -31,6 +34,9 @@ exports.dbauth = function(req, res) {
     // 2016/01/18 12:35:57, AA: According to
     // https://www.built.io/blog/2014/08/file-uploading-in-dropbox-using-node-js/
     var csrfToken = dbUtils.generateCSRFToken();
+    // TODO: concatenate @ req.baby set by /baby/:baby
+    // To obtain the baby in the Dropbox's reply
+    // if (req.baby) csrfToken += req.baby;
     var redirectUrl = dbUtils.generateRedirectURI(req);
     cache.put(REDIRECT_URL_KEY, redirectUrl);
 
@@ -73,6 +79,7 @@ exports.dbauthSuccess = function(req, res) {
     // 2016/01/18 22:20:50, AA: It has to use the same redirect created previously
     var redirectUri = cache.get(REDIRECT_URL_KEY);
 
+    // obtaining the Bearer token
     request.post('https://api.dropbox.com/1/oauth2/token', {
         form: {
             code: req.query.code,
@@ -91,18 +98,43 @@ exports.dbauthSuccess = function(req, res) {
 
         var token = data.access_token;
         req.session.token = data.access_token;
+
         request.post('https://api.dropbox.com/1/account/info', {
             headers: { Authorization: 'Bearer ' + token }
         }, function (error, response, body) {
             res.send('Logged in successfully as ' + JSON.parse(body).display_name + '.');
+
+            // TODO: get the baby from the req.query.state (split by @, :baby === last_part)
+            //       and save the slideshow with the Bearer token on MongoDB
+            //       (name = :baby, token = :token)
         });
 
     });
 };
 
+exports.babyindex = function(req, res) {
+    var slideshow = req.params.baby;
+    console.log('This is the requested slideshow: ', slideshow);
+    console.log('This are the params: ', req.params);
+
+    /*
+     * using app.param(:baby)
+     * If specified slideshow exists,
+     *      obtain the token from MongoDB and put the token on req.token
+     *      next()
+     * Else redirect to /dbauth
+     */
+
+    models.Slideshow.find(function(err, slideshows) {
+        if (err) return console.error(err);
+        console.log(slideshows);
+        res.send('Found some slideshows: ' + slideshows.length)
+    });
+}
+
 exports.uploadpdf = function(req, res) {
     // first dumb upload test
-    var serverpath = 'example_alright.pdf'; //file to be save at what path in server
+    var serverpath = 'example_third.pdf'; //file to be save at what path in server
     var localpath =  global.appRoot + '2091.pdf'; //path of the file which is to be uploaded
 
     console.log('I will send the following file: ', localpath);
@@ -111,4 +143,15 @@ exports.uploadpdf = function(req, res) {
     }
 
     return dbUtils.fileUpload(res, req.session.token, localpath, serverpath);
+};
+
+exports.metadata = function(req, res) {
+    var serverpath = '.';
+
+    console.log('I will ask for the following path: ', serverpath);
+    if (req.query.error) {
+        return res.send('ERROR ' + req.query.error + ': ' + req.query.error_description);
+    }
+
+    return dbUtils.metadata(res, req.session.token, serverpath);
 };
