@@ -132,17 +132,18 @@ exports.babyindex = function(req, res) {
     });
 }
 
-exports.uploadpdf = function(req, res) {
-    // first dumb upload test
-    var serverpath = 'example_third.pdf'; //file to be save at what path in server
-    var localpath =  global.appRoot + '2091.pdf'; //path of the file which is to be uploaded
+exports.upload = function(req, res) {
+    var media = req.params.media;
+
+    var serverpath = media; //file to be save at what path in server
+    var localpath =  global.appRoot + media; //path of the file which is to be uploaded
 
     console.log('I will send the following file: ', localpath);
     if (req.query.error) {
         return res.send('ERROR ' + req.query.error + ': ' + req.query.error_description);
     }
 
-    return dbUtils.fileUpload(res, req.session.token, localpath, serverpath);
+    return dbUtils.fileUpload(res, req.session.token, media, media);
 };
 
 exports.metadata = function(req, res) {
@@ -154,4 +155,15 @@ exports.metadata = function(req, res) {
     }
 
     return dbUtils.metadata(res, req.session.token, serverpath);
+};
+
+exports.media = function(req, res) {
+    var media = req.params.media;
+
+    console.log('I will ask for the following path: ./', media);
+    if (req.query.error) {
+        return res.send('ERROR ' + req.query.error + ': ' + req.query.error_description);
+    }
+
+    return dbUtils.media(res, req.session.token, media);
 };

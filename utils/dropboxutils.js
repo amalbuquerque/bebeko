@@ -52,3 +52,14 @@ module.exports.metadata = function(res, token, path) {
 
     var getRequest = request.get(options, callbackAfterGet);
 }
+
+module.exports.media = function(res, token, path) {
+    var options = { 'url' : 'https://api.dropboxapi.com/1/media/auto/' + path,
+         'headers': {
+            'Authorization' : 'Bearer ' + token
+        }};
+
+    var callbackAfterPost = simpleCallback(res);
+
+    var getRequest = request.post(options, callbackAfterPost);
+}
