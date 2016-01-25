@@ -5,10 +5,14 @@ var request = require('request');
 var fs = require('fs');
 
 module.exports.generateRedirectURI = function(req) {
+    var originalUrl = req.originalUrl;
+    if (originalUrl.indexOf('?') >= 0)
+        originalUrl = originalUrl.substring(0, originalUrl.indexOf('?'));
     return url.format({
         protocol: req.protocol,
         host: req.headers.host,
-        pathname: req.originalUrl + '/success'
+        // pathname: req.originalUrl + '/success'
+        pathname:  originalUrl + '/success'
     });
 };
 
